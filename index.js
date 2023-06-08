@@ -33,7 +33,7 @@ const verifyJWT=(req,res,next)=>{
     console.log(req.headers.authorization);
     const authorization=req.headers.authorization;
     if(!authorization){
-        return res.ststus(401).send({error:true,message:'Unauthorization access'})
+        return res.status(401).send({error:true,message:'Unauthorization access'})
     }
     const token= authorization.split(' ')[1];
     console.log('token inside verify jwt',token);
@@ -98,10 +98,16 @@ async function run() {
     })
 
 
-
+// ---------------------------------------------------
   app.get('/bookings',verifyJWT,async(req,res)=>{
-    console.log('cone back after verify');
+    const decoded=req.decoded;
+    console.log('cone back after verify',decoded);
     // console.log(req.headers.authorization);
+
+    if(decoded.email!==req.query.email){
+        return res.status(403).send({error:1, message:'forbidden access'})
+    }
+
     let query={};
     if(req.query?.email){
         query={email:req.query.email}
@@ -110,7 +116,7 @@ async function run() {
     res.send(result);
   })  
 
-
+// --------------------------------------------------------------
 
     app.delete('/bookings/:id', async(req,res)=>{
         const id=req.params.id;
